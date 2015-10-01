@@ -54,7 +54,6 @@ namespace KurisuRiven
         private static float wrange;
         private static float truerange;
         private static Vector3 movepos;
-
         #endregion
 
         # region Riven: Utils
@@ -260,25 +259,22 @@ namespace KurisuRiven
             if (!qtarg.IsValidTarget(truerange + 100))
                  qtarg = player;
 
-            if (_sh.IsValidTarget())
+            if (riventarget().IsValidTarget())
             {
                 if (menu.Item("combokey").GetValue<KeyBind>().Active ||
                     menu.Item("harasskey").GetValue<KeyBind>().Active ||
                     menu.Item("shycombo").GetValue<KeyBind>().Active)
                 {
-                    orbwalker.ForceTarget(_sh);
+                    orbwalker.ForceTarget(riventarget());
                 }
             }
 
             else
                 _sh = null;
 
-            if (didq && !canmv)
+            if (!canmv && didq)
             {
-                if (orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.None)
-                {
-                    player.IssueOrder(GameObjectOrder.MoveTo, movepos);
-                }
+                player.IssueOrder(GameObjectOrder.MoveTo, movepos);
             }
 
             // riven w range
@@ -327,7 +323,6 @@ namespace KurisuRiven
             SemiQ();
             AuraUpdate();
             CombatCore();
-            Windslash();
 
             orbwalker.SetAttack(canmv);
             orbwalker.SetMovement(canmv);
@@ -384,6 +379,8 @@ namespace KurisuRiven
 
             if (player.IsValid && menu.Item("fleekey").GetValue<KeyBind>().Active)
                 Flee();
+
+            Windslash();
         }
 
         #endregion
@@ -441,7 +438,6 @@ namespace KurisuRiven
             advance.AddItem(new MenuItem("qqc", "Test in a summoners rift custom on the Scuttler Crab")).SetFontStyle(FontStyle.Regular, SharpDX.Color.Gold);
             advance.AddItem(new MenuItem("qqa", "Lower = faster Q but may result in more AA cancels"));
             advance.AddItem(new MenuItem("qqb", "Higher = slower Q but less or no AA cancels"));
-            advance.AddItem(new MenuItem("qqd", "Lower your orbwalker hold radius for a better Q-AA")).SetFontStyle(FontStyle.Regular, SharpDX.Color.Gold);
             qmenu.AddSubMenu(advance);
 
             qmenu.AddItem(new MenuItem("wq3", "Ward + Q3 (Flee)")).SetValue(true);
@@ -617,7 +613,7 @@ namespace KurisuRiven
                 }
             }
 
-            else if (w.IsReady() && canw && menubool("usecombow") &&
+            if (w.IsReady() && canw && menubool("usecombow") &&
                      target.Distance(player.ServerPosition) <= wrange)
             {
                 useinventoryitems(target);
@@ -862,7 +858,7 @@ namespace KurisuRiven
                     }
                 }
 
-                else if (w.IsReady() && canw && menubool("usejunglew"))
+                if (w.IsReady() && canw && menubool("usejunglew"))
                 {
                     if (unit.Distance(player.ServerPosition) <= w.Range + 25)
                     {
@@ -1132,7 +1128,7 @@ namespace KurisuRiven
                     cane = false;
                     canws = false;
                     lastaa = Utils.GameTimeTickCount;
-                    qtarg = (Obj_AI_Base)args.Target;
+                    qtarg = (Obj_AI_Base) args.Target;
                 }
 
                 if (args.SData.Name.ToLower().Contains("ward"))
@@ -1142,14 +1138,14 @@ namespace KurisuRiven
                 {
                     case "RivenTriCleave":
                         cc += 1;
+                        canmv = false;
                         didq = true;
                         didaa = false;
-                        canmv = false;
                         lastq = Utils.GameTimeTickCount;
                         canq = false;
 
                         if (cc >= 2)
-                            Utility.DelayAction.Add(425 + (100 - Game.Ping / 2),
+                            Utility.DelayAction.Add(425 - (100 - Game.Ping / 2),
                                 () => Orbwalking.LastAATick = 0);
 
                         if (!uo) ssfl = false;
@@ -1266,7 +1262,7 @@ namespace KurisuRiven
 
                         break;
                     case "ItemTiamatCleave":
-                    case "ItemTitanicHydraCleave":
+                    case "ItemTitanicHydraCleave":  
                         lasthd = Utils.GameTimeTickCount;
                         didhd = true;
                         canws = true;
@@ -1461,27 +1457,6 @@ namespace KurisuRiven
 
         private void OnPlayAnimation()
         {
-            Obj_AI_Base.OnPlayAnimation += (sender, args) =>
-            {
-                if (!(didq || didw || didws || dide) && !player.IsDead)
-                {
-                    if (sender.IsMe)
-                    {
-                        if (args.Animation.Contains("Idle"))
-                        {
-                            canq = false;
-                            canaa = true;
-                        }
-
-                        if (args.Animation.Contains("Run"))
-                        {
-                            canq = false;
-                            canaa = true;
-                        }
-                    }
-                }
-
-            };
         }
 
         #endregion
@@ -1542,8 +1517,13 @@ namespace KurisuRiven
                 }
             }
 
-            if (canmv && q.IsReady() && target.IsValidTarget(truerange + 100 + rangeoverride))
-                Orbwalking.LastAATick = 0;
+            if (canmv && q.IsReady())
+            {
+                if (target.IsValidTarget(truerange + 100 + rangeoverride))
+                {
+                    Orbwalking.LastAATick = 0;
+                }
+            }
         }
 
         private static void CombatCore()

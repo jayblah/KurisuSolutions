@@ -1,1 +1,2 @@
-﻿New: Optional menu to use potions out of combat.
+﻿New: Added combo mode for Heal and Exhaust (optional)
+Fixed: Always using exhaust even in combo mode.

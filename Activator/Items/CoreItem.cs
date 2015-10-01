@@ -136,6 +136,12 @@ namespace Activator.Items
             Menu.AddItem(new MenuItem("use" + Name, "Use " + usefname)).SetValue(true);
             Menu.AddItem(new MenuItem("prior" + Name, DisplayName + " Priority")).SetValue(new Slider(Priority, 1, 7));
 
+            if (Category.Any(t => t == MenuType.SelfLowHP) &&
+               (Name.Contains("Potion") || Name.Contains("Flask") || Name.Contains("Biscuit")))
+            {
+                Menu.AddItem(new MenuItem("use" + Name + "cbat", "Predict Damage")).SetValue(true);
+            }
+
             if (Category.Any(t => t == MenuType.EnemyLowHP))
             {
                 Menu.AddItem(new MenuItem("enemylowhp" + Name + "pct", "Use on Enemy HP % <="))
@@ -144,11 +150,11 @@ namespace Activator.Items
 
             if (Category.Any(t => t == MenuType.SelfLowHP))
                 Menu.AddItem(new MenuItem("selflowhp" + Name + "pct", "Use on Hero HP % <="))
-                    .SetValue(new Slider(DefaultHP <= 50 || DefaultHP > 90 ? DefaultHP : 25));
+                    .SetValue(new Slider(DefaultHP <= 50 || DefaultHP > 90 ? DefaultHP : 45));
 
             if (Category.Any(t => t == MenuType.SelfMuchHP))
                 Menu.AddItem(new MenuItem("selfmuchhp" + Name + "pct", "Use on Hero Dmg Dealt % >="))
-                    .SetValue(new Slider(DefaultHP > 45 ? 55 : DefaultHP < 35 ? 45 : 35));
+                    .SetValue(new Slider(DefaultHP > 45 ? 55 : DefaultHP < 35 ? 45 : 40));
 
             if (Category.Any(t => t == MenuType.SelfLowMP))
                 Menu.AddItem(new MenuItem("selflowmp" + Name + "pct", "Use on Hero Mana % <="))
@@ -163,12 +169,6 @@ namespace Activator.Items
 
             if (Category.Any(t => t == MenuType.SelfMinHP))
                 Menu.AddItem(new MenuItem("selfminhp" + Name + "pct", "Minimum HP %")).SetValue(new Slider(55));
-
-            if (Category.Any(t => t == MenuType.SelfLowHP) &&
-               (Name.Contains("Potion") || Name.Contains("Flask") || Name.Contains("Biscuit")))
-            {
-                Menu.AddItem(new MenuItem("use" + Name + "cbat", "Use Only in Combat")).SetValue(true);
-            }
 
             if (Category.Any(t => t == MenuType.Zhonyas))
             {
