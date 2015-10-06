@@ -69,7 +69,7 @@
     <Compile Include="SPrediction\ConePrediction.cs" />
     <Compile Include="SPrediction\Geometry.cs" />
     <Compile Include="SPrediction\LinePrediction.cs" />
-    <Compile Include="SPrediction\Obj_AI_HeroExtensions.cs" />
+    <Compile Include="SPrediction\Extensions.cs" />
     <Compile Include="SPrediction\PathTracker.cs" />
     <Compile Include="SPrediction\Prediction.cs" />
     <Compile Include="SPrediction\SpellExtensions.cs" />
